@@ -8,22 +8,51 @@ namespace Boolean_Expression_Simplifier
 {
     class Program
     {
-        static void populateTruthTable(bool[,] TruthTable)
+        static void populateTruthTable(bool[,] TruthTable, string algerbraicExpression)
         {
-            bool output;
+
+            //Populate input values
+            bool inputValue;
+
             for (int i = 0; i < TruthTable.GetLength(0) - 1; i++)
             {
-                output = false;
+                inputValue = false;
                 int y = 0;
                 for (int j = 0; j < Math.Pow(2, i + 1); j++)
                 {
                     for (int k = 0; k < Math.Pow(2, ((TruthTable.GetLength(0) - 2) - i)); k++)
                     {
-                        TruthTable[i, y] = output;
+                        TruthTable[i, y] = inputValue;
                         y++;
                     }
-                    output = !output;
+                    inputValue = !inputValue;
                 }
+            }
+
+            //Calculate and populate output values
+            string[] expressions;
+            expressions = algerbraicExpression.Split('+');
+            bool outputValue;
+
+            for (int i = 0; i < TruthTable.GetLength(1); i++)
+            {
+                outputValue = true;
+                foreach (string expression in expressions)
+                {
+                    outputValue = true;
+                    foreach (char term in expression.ToCharArray())
+                    {
+                        if (TruthTable[term - 65, i] == false)
+                        {
+                            outputValue = false;
+                        }
+                    }
+                    if (outputValue == true)
+                    {
+                        break; // <-- I hate this
+                    }
+                }
+                TruthTable[TruthTable.GetLength(0)-1, i] = outputValue;
             }
         }
 
@@ -35,11 +64,15 @@ namespace Boolean_Expression_Simplifier
                 Console.Write((char)i);
                 RowPad();
             }
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("Z");
+            RowPad();
             Console.WriteLine();
+
 
             for (int i = 0; i < TruthTable.GetLength(1)-1; i++)
             {
-                for (int j = 0; j < TruthTable.GetLength(0) - 1; j++)
+                for (int j = 0; j < TruthTable.GetLength(0); j++)
                 {
                     int value = TruthTable[j, i] ? 1 : 0;
                     
@@ -49,6 +82,7 @@ namespace Boolean_Expression_Simplifier
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
         }
 
         static void backGroundBinaryColour(int value)
@@ -69,25 +103,42 @@ namespace Boolean_Expression_Simplifier
             Console.Write(" | ");
         }
 
+        static bool exitTest()
+        {
+            Console.WriteLine("Run again?");
+            return Console.ReadLine().ToLower() == "yes";
+        }
+
         static void Main(string[] args)
         {
             string oldOut;
             int numInputs;
             double numOutputs;
-            bool[,] originalTruthTable;
+            bool[,] myTruthTable;
 
-            Console.WriteLine("How many inputs are there?");
-            numInputs = System.Convert.ToInt16(Console.ReadLine());
-            numOutputs = Math.Pow(2, numInputs);
+            do
+            {
+                //Setup
+                Console.Clear();
+                Console.WriteLine("How many inputs are there?");
+                numInputs = System.Convert.ToInt16(Console.ReadLine());
+                numOutputs = Math.Pow(2, numInputs);
 
-            Console.WriteLine("What are the outputs?");
-            oldOut = Console.ReadLine();
+                Console.WriteLine("Whats the boolean expression?");
+                oldOut = Console.ReadLine();
 
-            originalTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
-            populateTruthTable(originalTruthTable);
+                myTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
 
-            displayTruthTable(originalTruthTable);
-            Console.ReadLine();
+                //Calculate the outputs based on the expression
+
+
+
+
+                //Populate and display the truth table
+                populateTruthTable(myTruthTable, oldOut);
+                displayTruthTable(myTruthTable);
+
+            } while (exitTest());
         }
 
 
