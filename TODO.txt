@@ -10,3 +10,4 @@
 >add error checking in num inputs input to ensure its only a number being entered
 >add error checking in the boolean expression input to ensure no illegal characters can be entered
 >add text processing to boolean expression to trim off ilegal characters
+>improve on exit test

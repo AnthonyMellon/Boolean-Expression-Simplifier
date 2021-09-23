@@ -42,6 +42,7 @@ namespace Boolean_Expression_Simplifier
                     outputValue = true;
                     foreach (char term in expression.ToCharArray())
                     {
+                        
                         if (TruthTable[term - 65, i] == false)
                         {
                             outputValue = false;
@@ -125,19 +126,17 @@ namespace Boolean_Expression_Simplifier
             {
                 //Setup
                 Console.Clear();
+                instructions();
+
+                //Get the number of inputs, use this to calculate number of outputs. Use these two values to create the truth table array
                 Console.WriteLine("How many inputs are there?");
                 numInputs = System.Convert.ToInt16(Console.ReadLine());
                 numOutputs = Math.Pow(2, numInputs);
-
-                Console.WriteLine("Whats the boolean expression?");
-                oldOut = Console.ReadLine();
-
                 myTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
 
-                //Calculate the outputs based on the expression
-
-
-
+                //Get the boolean expression
+                Console.WriteLine("Whats the boolean expression?");
+                oldOut = Console.ReadLine();
 
                 //Populate and display the truth table
                 populateTruthTable(myTruthTable, oldOut);
