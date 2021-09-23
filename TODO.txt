@@ -1,0 +1,12 @@
+---CORE FUNCIONALITY---
+>produce some form of karnaugh map from truth table
+>use the karnaugh map to simplify the algebraic expression
+>run the new algebraic expression through to check it matches the old algebraic expression
+
+
+
+---POLISHING---
+>count number of inputs using algebraic expression entered
+>add error checking in num inputs input to ensure its only a number being entered
+>add error checking in the boolean expression input to ensure no illegal characters can be entered
+>add text processing to boolean expression to trim off ilegal characters

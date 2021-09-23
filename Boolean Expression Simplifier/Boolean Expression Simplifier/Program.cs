@@ -109,6 +109,11 @@ namespace Boolean_Expression_Simplifier
             return Console.ReadLine().ToLower() == "yes";
         }
 
+        static void instructions()
+        {
+            Console.WriteLine("Enter algebraic expressions in form of 'AB+C'");
+        }
+
         static void Main(string[] args)
         {
             string oldOut;
