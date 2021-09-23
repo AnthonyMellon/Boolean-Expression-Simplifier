@@ -8,6 +8,14 @@ namespace Boolean_Expression_Simplifier
 {
     class Program
     {
+        #region Global_Variables
+        static string oldOut;
+        static int numInputs;
+        static double numOutputs;
+        static bool[,] myTruthTable;
+        #endregion
+
+        #region Major_Processing_Functions
         static void populateTruthTable(bool[,] TruthTable, string algerbraicExpression)
         {
 
@@ -42,7 +50,7 @@ namespace Boolean_Expression_Simplifier
                     outputValue = true;
                     foreach (char term in expression.ToCharArray())
                     {
-                        
+
                         if (TruthTable[term - 65, i] == false)
                         {
                             outputValue = false;
@@ -53,13 +61,13 @@ namespace Boolean_Expression_Simplifier
                         break; // <-- I hate this
                     }
                 }
-                TruthTable[TruthTable.GetLength(0)-1, i] = outputValue;
+                TruthTable[TruthTable.GetLength(0) - 1, i] = outputValue;
             }
         }
 
         static void displayTruthTable(bool[,] TruthTable)
         {
-            for (int i = 65; i < TruthTable.GetLength(0)-1 + 65; i++)
+            for (int i = 65; i < TruthTable.GetLength(0) - 1 + 65; i++)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write((char)i);
@@ -71,12 +79,12 @@ namespace Boolean_Expression_Simplifier
             Console.WriteLine();
 
 
-            for (int i = 0; i < TruthTable.GetLength(1)-1; i++)
+            for (int i = 0; i < TruthTable.GetLength(1) - 1; i++)
             {
                 for (int j = 0; j < TruthTable.GetLength(0); j++)
                 {
                     int value = TruthTable[j, i] ? 1 : 0;
-                    
+
                     backGroundBinaryColour(value);
                     Console.Write((value).ToString());
                     RowPad();
@@ -85,7 +93,9 @@ namespace Boolean_Expression_Simplifier
             }
             Console.WriteLine();
         }
+        #endregion
 
+        #region Minor_Processing_Functions
         static void backGroundBinaryColour(int value)
         {
             if (value == 1)
@@ -97,55 +107,59 @@ namespace Boolean_Expression_Simplifier
                 Console.ForegroundColor = ConsoleColor.Red;
             }
         }
-
         static void RowPad()
         {
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write(" | ");
         }
-
         static bool exitTest()
         {
             Console.WriteLine("Run again?");
             return Console.ReadLine().ToLower() == "yes";
         }
+        #endregion
 
+        #region Other_Functions
         static void instructions()
         {
             Console.WriteLine("Enter algebraic expressions in form of 'AB+C'");
         }
+        #endregion
+      
+        #region Main_Functions
+        static void setup()
+        {
+
+        }
+        static bool loop()
+        {
+            //Setup
+            Console.Clear();
+            instructions();
+
+            //Get the number of inputs, use this to calculate number of outputs. Use these two values to create the truth table array
+            Console.WriteLine("How many inputs are there?");
+            numInputs = System.Convert.ToInt16(Console.ReadLine());
+            numOutputs = Math.Pow(2, numInputs);
+            myTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
+
+            //Get the boolean expression
+            Console.WriteLine("Whats the boolean expression?");
+            oldOut = Console.ReadLine();
+
+            //Populate and display the truth table
+            populateTruthTable(myTruthTable, oldOut);
+            displayTruthTable(myTruthTable);
+
+            return (exitTest());
+        }
+        #endregion
+
 
         static void Main(string[] args)
         {
-            string oldOut;
-            int numInputs;
-            double numOutputs;
-            bool[,] myTruthTable;
-
-            do
-            {
-                //Setup
-                Console.Clear();
-                instructions();
-
-                //Get the number of inputs, use this to calculate number of outputs. Use these two values to create the truth table array
-                Console.WriteLine("How many inputs are there?");
-                numInputs = System.Convert.ToInt16(Console.ReadLine());
-                numOutputs = Math.Pow(2, numInputs);
-                myTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
-
-                //Get the boolean expression
-                Console.WriteLine("Whats the boolean expression?");
-                oldOut = Console.ReadLine();
-
-                //Populate and display the truth table
-                populateTruthTable(myTruthTable, oldOut);
-                displayTruthTable(myTruthTable);
-
-            } while (exitTest());
+            setup();
+            while (loop() == true);
         }
-
-
-
     }
 }
