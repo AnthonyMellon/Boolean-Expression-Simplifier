@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,95 +17,94 @@ namespace Boolean_Expression_Simplifier
         #endregion
 
         #region Major_Processing_Functions
-        static void populateTruthTable(bool[,] TruthTable, string algerbraicExpression)
+        static void generateTruthTable(bool[,] TruthTable, string algerbraicExpression)
         {
+            truthTableHeader(TruthTable);
 
-            //Populate input values
-            bool inputValue;
+            string[] ANDexpressions;
+            ANDexpressions = algerbraicExpression.Split('+');
 
-            for (int i = 0; i < TruthTable.GetLength(0) - 1; i++)
+            //Populate and display input values
+            for (int row = 0; row < TruthTable.GetLength(1); row++)
             {
-                inputValue = false;
-                int y = 0;
-                for (int j = 0; j < Math.Pow(2, i + 1); j++)
+
+                //Calculate and populate the input values
+                int total = row;
+                for (int col = 0; col < TruthTable.GetLength(0) - 1; col++)
                 {
-                    for (int k = 0; k < Math.Pow(2, ((TruthTable.GetLength(0) - 2) - i)); k++)
+                    int colValue = (int)Math.Pow(2, (TruthTable.GetLength(0) - 2) - col);
+                    if (colValue <= total)
                     {
-                        TruthTable[i, y] = inputValue;
-                        y++;
+                        total -= colValue;
+                        TruthTable[col, row] = true;
                     }
-                    inputValue = !inputValue;
+
+                    displayValue((char)(TruthTable[col, row] ? 0:1), backGroundBinaryColour(TruthTable[col, row]));
                 }
-            }
 
-            //Calculate and populate output values
-            string[] expressions;
-            expressions = algerbraicExpression.Split('+');
-            bool outputValue;
-
-            for (int i = 0; i < TruthTable.GetLength(1); i++)
-            {
-                outputValue = true;
-                foreach (string expression in expressions)
+                //Calculate and populate the output value
+                bool outputValue = true;
+                foreach (string expression in ANDexpressions)
                 {
                     outputValue = true;
                     foreach (char term in expression.ToCharArray())
                     {
 
-                        if (TruthTable[term - 65, i] == false)
+                        if (TruthTable[term - 65, row] == false)
                         {
                             outputValue = false;
                         }
                     }
                     if (outputValue == true)
                     {
-                        break; // <-- I hate this
+                        break; // <-- i hate this
                     }
                 }
-                TruthTable[TruthTable.GetLength(0) - 1, i] = outputValue;
+
+                //Display the output value
+                displayValue((char)(outputValue ? 1 : 0), backGroundBinaryColour(outputValue));
+                Console.WriteLine();
+
             }
         }
 
-        static void displayTruthTable(bool[,] TruthTable)
+        static void truthTableHeader(bool[,] TruthTable)
         {
             for (int i = 65; i < TruthTable.GetLength(0) - 1 + 65; i++)
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write((char)i);
-                RowPad();
+                displayValue((char)i, ConsoleColor.Cyan);
             }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Z");
             RowPad();
             Console.WriteLine();
-
-
-            for (int i = 0; i < TruthTable.GetLength(1) - 1; i++)
-            {
-                for (int j = 0; j < TruthTable.GetLength(0); j++)
-                {
-                    int value = TruthTable[j, i] ? 1 : 0;
-
-                    backGroundBinaryColour(value);
-                    Console.Write((value).ToString());
-                    RowPad();
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
         }
         #endregion
 
         #region Minor_Processing_Functions
-        static void backGroundBinaryColour(int value)
+        //static void displayValue(bool value)
+        //{
+        //    backGroundBinaryColour(value);
+        //    Console.Write((value ? 1 : 0));
+        //    RowPad();
+        //}
+
+        static void displayValue(char value, ConsoleColor colour)
         {
-            if (value == 1)
+            Console.ForegroundColor = colour;
+            Console.Write(value);
+            RowPad();
+        }
+        
+        static ConsoleColor backGroundBinaryColour(bool value)
+        {
+            if (value)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
+                return ConsoleColor.Green;
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+                return ConsoleColor.Red;
             }
         }
         static void RowPad()
@@ -148,8 +148,14 @@ namespace Boolean_Expression_Simplifier
             oldOut = Console.ReadLine();
 
             //Populate and display the truth table
-            populateTruthTable(myTruthTable, oldOut);
-            displayTruthTable(myTruthTable);
+            var SW = new Stopwatch();
+            SW.Start();
+            //truthTableHeader(myTruthTable);
+            generateTruthTable(myTruthTable, oldOut);
+            SW.Stop();
+            Console.WriteLine(SW.Elapsed.TotalMilliseconds);
+
+            
 
             return (exitTest());
         }
