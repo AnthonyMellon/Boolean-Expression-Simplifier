@@ -25,7 +25,7 @@ namespace Boolean_Expression_Simplifier
             ANDexpressions = algerbraicExpression.Split('+');
 
             //Populate and display input values
-            for (int row = 0; row < TruthTable.GetLength(1); row++)
+            for (int row = 0; row < TruthTable.GetLength(1)-1; row++)
             {
 
                 //Calculate and populate the input values
@@ -39,20 +39,42 @@ namespace Boolean_Expression_Simplifier
                         TruthTable[col, row] = true;
                     }
 
-                    displayValue((char)(TruthTable[col, row] ? 0:1), backGroundBinaryColour(TruthTable[col, row]));
+                    displayValue(Convert.ToString((TruthTable[col, row] ? 1 : 0))[0], backGroundBinaryColour(TruthTable[col, row]));
                 }
 
                 //Calculate and populate the output value
-                bool outputValue = true;
-                foreach (string expression in ANDexpressions)
+                bool outputValue = false;
+                foreach (string expression in ANDexpressions) //Loop through each expression after sperating by ors
                 {
                     outputValue = true;
-                    foreach (char term in expression.ToCharArray())
+                    for (int term = 0; term < expression.Length; term++)  //A, !, B
                     {
-
-                        if (TruthTable[term - 65, row] == false)
+                        if (expression[term] != '!')
                         {
-                            outputValue = false;
+                            if (term != 0)  //Make sure there is a term before this one
+                            {
+                                if (expression[term-1] == '!') //If there is a not before this term
+                                {
+                                    if (TruthTable[expression[term] - 65, row] == true)
+                                    {
+                                        outputValue = false;
+                                    }
+                                }
+                                else //If there is no not before this term
+                                {
+                                    if (TruthTable[expression[term] - 65, row] == false)
+                                    {
+                                        outputValue = false;
+                                    }
+                                }
+                            }
+                            else //If this is the first term
+                            {
+                                if (TruthTable[expression[term] - 65, row] == false)
+                                {
+                                    outputValue = false;
+                                }
+                            }
                         }
                     }
                     if (outputValue == true)
@@ -62,7 +84,7 @@ namespace Boolean_Expression_Simplifier
                 }
 
                 //Display the output value
-                displayValue((char)(outputValue ? 1 : 0), backGroundBinaryColour(outputValue));
+                displayValue(Convert.ToString((outputValue ? 1 : 0))[0], backGroundBinaryColour(outputValue));
                 Console.WriteLine();
 
             }
@@ -81,13 +103,32 @@ namespace Boolean_Expression_Simplifier
         }
         #endregion
 
+        static void generateKarnaughMap(bool[,] TruthTable)
+        {
+            int sizeX;
+            int sizeY;
+
+            //Half the number of inputs, then round up and down
+            sizeX = (int)Math.Round(((double)(myTruthTable.GetLength(0) - 1) / 2) - 0.1);
+            sizeY = (int)Math.Round(((double)(myTruthTable.GetLength(0) - 1) / 2) + 0.1);
+
+            bool[,] myKarnaughMap = new bool[sizeX*2, sizeY*2];
+
+            //Populate KarnaughMap
+            for (int x = 0; x < myKarnaughMap.GetLength(0) - 1; x++) 
+            {
+                int xVal = (x + 1);
+                for (int y = 0; y < myKarnaughMap.GetLength(1) - 1; y++)
+                {
+                    int ttY = 1;
+                    // tty = Bx + LxBy
+
+                    myKarnaughMap[x, y] = myTruthTable[myTruthTable.GetLength(0) - 1, ttY];
+                }
+            }
+        }
+
         #region Minor_Processing_Functions
-        //static void displayValue(bool value)
-        //{
-        //    backGroundBinaryColour(value);
-        //    Console.Write((value ? 1 : 0));
-        //    RowPad();
-        //}
 
         static void displayValue(char value, ConsoleColor colour)
         {
@@ -95,7 +136,6 @@ namespace Boolean_Expression_Simplifier
             Console.Write(value);
             RowPad();
         }
-        
         static ConsoleColor backGroundBinaryColour(bool value)
         {
             if (value)
@@ -140,22 +180,24 @@ namespace Boolean_Expression_Simplifier
             //Get the number of inputs, use this to calculate number of outputs. Use these two values to create the truth table array
             Console.WriteLine("How many inputs are there?");
             numInputs = System.Convert.ToInt16(Console.ReadLine());
+
             numOutputs = Math.Pow(2, numInputs);
+
             myTruthTable = new bool[numInputs + 1, (int)numOutputs + 1];
+
 
             //Get the boolean expression
             Console.WriteLine("Whats the boolean expression?");
             oldOut = Console.ReadLine();
 
-            //Populate and display the truth table
-            var SW = new Stopwatch();
-            SW.Start();
-            //truthTableHeader(myTruthTable);
-            generateTruthTable(myTruthTable, oldOut);
-            SW.Stop();
-            Console.WriteLine(SW.Elapsed.TotalMilliseconds);
 
-            
+            //Populate and display the truth table
+            generateTruthTable(myTruthTable, oldOut);
+
+
+            //Generate the Karnaugh Map
+            //generateKarnaughMap(myTruthTable);
+
 
             return (exitTest());
         }
