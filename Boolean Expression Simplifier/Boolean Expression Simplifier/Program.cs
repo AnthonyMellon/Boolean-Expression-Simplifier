@@ -120,12 +120,63 @@ namespace Boolean_Expression_Simplifier
                 int xVal = (x + 1);
                 for (int y = 0; y < myKarnaughMap.GetLength(1) - 1; y++)
                 {
-                    int ttY = 1;
+                    int outputIndex = 1;
                     // tty = Bx + LxBy
 
-                    myKarnaughMap[x, y] = myTruthTable[myTruthTable.GetLength(0) - 1, ttY];
+                    myKarnaughMap[x, y] = myTruthTable[myTruthTable.GetLength(0) - 1, outputIndex];
                 }
             }
+        }
+
+        static void drawKarnaughMap(bool[,] karnaughMap)
+        {
+            for(int i = 0; i < karnaughMap.GetLength(1); i++)
+            {
+                for(int j = 0; j < karnaughMap.GetLength(0); j++)
+                {
+                    Console.WriteLine(karnaughMap[0, 1]);
+                }
+            }
+        }
+
+        static int[,] generateGreyCode(int numBits)
+        {                
+            int[,] greyCode = new int[numBits,(int)Math.Pow(2,numBits)];
+
+            for(int i = 0; i < numBits; i++) //Loop through each input
+            {
+                int largeGreyCodeLength = (int)(Math.Pow(2, numBits) + Math.Pow(2, numBits));
+                int[] largeGreyCode = new int[largeGreyCodeLength];
+                
+                int index = 0;
+                bool output = false;
+
+                while (index < largeGreyCode.Length)
+                {
+                    for (int k = 0; k < Math.Pow(2, numBits - i); k++) //K is less than 2 to the power of inverse index
+                    {
+                        largeGreyCode[index] = output ? 1 : 0;
+                        index++;
+                    }
+                    output = !output;
+                }
+
+                for(int j = 0; j < greyCode.GetLength(1); j++)
+                {
+                    greyCode[i, j] = largeGreyCode[j + (int)Math.Pow(2, numBits - (i + 1))];
+                }
+            }
+
+            //for(int i = 0; i < greyCode.GetLength(1); i++)
+            //{
+            //    for(int j = 0; j < greyCode.GetLength(0); j++)
+            //    {
+            //        Console.Write(greyCode[j, i]);
+            //    }
+            //    Console.WriteLine();
+            //}
+
+            return greyCode;
         }
 
         #region Minor_Processing_Functions
@@ -196,7 +247,8 @@ namespace Boolean_Expression_Simplifier
 
 
             //Generate the Karnaugh Map
-            //generateKarnaughMap(myTruthTable);
+            generateKarnaughMap(myTruthTable);
+            generateGreyCode(4);
 
 
             return (exitTest());
