@@ -107,19 +107,25 @@ namespace Boolean_Expression_Simplifier
         static void generateKarnaughMap(bool[,] TruthTable)
         {
             int sizeX;
+            int numInputsX;
             int sizeY;
+            int numInputsY;
 
-            //Half the number of inputs, then round up and down
-            sizeX = (int)Math.Pow(2,(int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) - 0.1));
-            sizeY = (int)Math.Pow(2,(int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) + 0.1));
+            //Get the number of inputs for each axis. Use this to find the number of outputs along each axis
+            numInputsX = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) - 0.1);
+            numInputsY = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) + 0.1);
+            sizeX = (int)Math.Pow(2, numInputsX);
+            sizeY = (int)Math.Pow(2, numInputsY);
 
             bool[,] myKarnaughMap = new bool[sizeX, sizeY];
 
-            //Populate KarnaughMap
-            for (int x = 0; x < sizeX; x++) 
+            //Populate KarnaughMap            
+            for (int x = 0; x < sizeX; x++) //This takes forever
             {
+                Console.WriteLine($"X:{x}/{sizeX}");
                 for (int y = 0; y < sizeY; y++)
                 {
+                    Console.WriteLine($"    Y:{y}/{sizeY}");
                     int[,] greyCodeX = generateGreyCode(sizeX);
                     int[,] greyCodeY = generateGreyCode(sizeY);
 
@@ -148,16 +154,22 @@ namespace Boolean_Expression_Simplifier
                 }
             }
 
-            drawKarnaughMap(myKarnaughMap);
+            drawKarnaughMap(myKarnaughMap, numInputsX, numInputsY);
+            Console.WriteLine("done drawing");
         }
 
-        static void drawKarnaughMap(bool[,] karnaughMap)
-        {
-            int[,] greyCodeX = generateGreyCode(2);
+        static void drawKarnaughMap(bool[,] karnaughMap, int numInputsX, int numInputsY)
+        {            
+            int[,] greyCodeX = generateGreyCode(numInputsX);
+            int[,] greyCodeY = generateGreyCode(numInputsY);
 
-            for(int i = 0; i < karnaughMap.GetLength(1); i++)
+            for(int i = 0; i < karnaughMap.GetLength(1); i++) //Loop through each row
             {
-                for(int j = 0; j < karnaughMap.GetLength(0); j++)
+                for(int j = 0; j < greyCodeY.GetLength(0); j++)
+                {
+                    Console.Write(greyCodeY[j, i]);
+                }
+                for (int j = 0; j < karnaughMap.GetLength(0); j++) //Loop through each column
                 {
                     displayValue(Convert.ToString(karnaughMap[j, i] ? 1 : 0)[0], backGroundBinaryColour(karnaughMap[j, i]));
                 }
