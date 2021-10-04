@@ -110,15 +110,15 @@ namespace Boolean_Expression_Simplifier
             int sizeY;
 
             //Half the number of inputs, then round up and down
-            sizeX = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) - 0.1);
-            sizeY = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) + 0.1);
+            sizeX = (int)Math.Pow(2,(int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) - 0.1));
+            sizeY = (int)Math.Pow(2,(int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) + 0.1));
 
-            bool[,] myKarnaughMap = new bool[sizeX*2, sizeY*2];
+            bool[,] myKarnaughMap = new bool[sizeX, sizeY];
 
             //Populate KarnaughMap
-            for (int x = 0; x < myKarnaughMap.GetLength(0); x++) 
+            for (int x = 0; x < sizeX; x++) 
             {
-                for (int y = 0; y < myKarnaughMap.GetLength(1); y++)
+                for (int y = 0; y < sizeY; y++)
                 {
                     int[,] greyCodeX = generateGreyCode(sizeX);
                     int[,] greyCodeY = generateGreyCode(sizeY);
@@ -140,7 +140,7 @@ namespace Boolean_Expression_Simplifier
                     int deciX = binaryToDecimal(binX);
                     int deciY = binaryToDecimal(binY);
 
-                    int outputIndex = deciX + (sizeX*deciY*2);
+                    int outputIndex = deciX + (sizeX*deciY);
                     //Console.WriteLine($"X:{x} , Y:{y} , DX:{deciX} , DY:{deciY} , I:{outputIndex}");
                     //Console.WriteLine(myTruthTable[TruthTable.GetLength(0) - 1, outputIndex]);
 
@@ -153,6 +153,8 @@ namespace Boolean_Expression_Simplifier
 
         static void drawKarnaughMap(bool[,] karnaughMap)
         {
+            int[,] greyCodeX = generateGreyCode(2);
+
             for(int i = 0; i < karnaughMap.GetLength(1); i++)
             {
                 for(int j = 0; j < karnaughMap.GetLength(0); j++)
