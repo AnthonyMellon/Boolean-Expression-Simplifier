@@ -43,7 +43,7 @@ namespace Boolean_Expression_Simplifier
                 }
 
                 //Calculate and populate the output value
-                bool outputValue = false;
+                bool outputValue = true;
                 foreach (string expression in ANDexpressions) //Loop through each expression after sperating by ors
                 {
                     outputValue = true;
@@ -84,6 +84,7 @@ namespace Boolean_Expression_Simplifier
                 }
 
                 //Display the output value
+                TruthTable[myTruthTable.GetLength(0) - 1, row] = outputValue;
                 displayValue(Convert.ToString((outputValue ? 1 : 0))[0], backGroundBinaryColour(outputValue));
                 Console.WriteLine();
 
@@ -109,23 +110,45 @@ namespace Boolean_Expression_Simplifier
             int sizeY;
 
             //Half the number of inputs, then round up and down
-            sizeX = (int)Math.Round(((double)(myTruthTable.GetLength(0) - 1) / 2) - 0.1);
-            sizeY = (int)Math.Round(((double)(myTruthTable.GetLength(0) - 1) / 2) + 0.1);
+            sizeX = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) - 0.1);
+            sizeY = (int)Math.Round(((double)(TruthTable.GetLength(0) - 1) / 2) + 0.1);
 
             bool[,] myKarnaughMap = new bool[sizeX*2, sizeY*2];
 
             //Populate KarnaughMap
-            for (int x = 0; x < myKarnaughMap.GetLength(0) - 1; x++) 
+            for (int x = 0; x < myKarnaughMap.GetLength(0); x++) 
             {
-                int xVal = (x + 1);
-                for (int y = 0; y < myKarnaughMap.GetLength(1) - 1; y++)
+                for (int y = 0; y < myKarnaughMap.GetLength(1); y++)
                 {
-                    int outputIndex = 1;
-                    // tty = Bx + LxBy
+                    int[,] greyCodeX = generateGreyCode(sizeX);
+                    int[,] greyCodeY = generateGreyCode(sizeY);
 
-                    myKarnaughMap[x, y] = myTruthTable[myTruthTable.GetLength(0) - 1, outputIndex];
+                    int[] binX;
+                    binX = new int[greyCodeX.GetLength(0)];
+                    for(int i = 0; i < binX.Length; i++)
+                    {
+                        binX[i] = greyCodeX[i, x];
+                    }
+
+                    int[] binY;
+                    binY = new int[greyCodeY.GetLength(0)];
+                    for(int i = 0; i < binY.Length; i++)
+                    {
+                        binY[i] = greyCodeY[i, y];
+                    }
+
+                    int deciX = binaryToDecimal(binX);
+                    int deciY = binaryToDecimal(binY);
+
+                    int outputIndex = deciX + (sizeX*deciY*2);
+                    //Console.WriteLine($"X:{x} , Y:{y} , DX:{deciX} , DY:{deciY} , I:{outputIndex}");
+                    //Console.WriteLine(myTruthTable[TruthTable.GetLength(0) - 1, outputIndex]);
+
+                    myKarnaughMap[x, y] = myTruthTable[TruthTable.GetLength(0)-1, outputIndex];
                 }
             }
+
+            drawKarnaughMap(myKarnaughMap);
         }
 
         static void drawKarnaughMap(bool[,] karnaughMap)
@@ -134,8 +157,9 @@ namespace Boolean_Expression_Simplifier
             {
                 for(int j = 0; j < karnaughMap.GetLength(0); j++)
                 {
-                    Console.WriteLine(karnaughMap[0, 1]);
+                    displayValue(Convert.ToString(karnaughMap[j, i] ? 1 : 0)[0], backGroundBinaryColour(karnaughMap[j, i]));
                 }
+                Console.WriteLine();
             }
         }
 
@@ -167,19 +191,25 @@ namespace Boolean_Expression_Simplifier
                 }
             }
 
-            //for(int i = 0; i < greyCode.GetLength(1); i++)
-            //{
-            //    for(int j = 0; j < greyCode.GetLength(0); j++)
-            //    {
-            //        Console.Write(greyCode[j, i]);
-            //    }
-            //    Console.WriteLine();
-            //}
-
             return greyCode;
         }
 
         #region Minor_Processing_Functions
+
+        static int binaryToDecimal(int[] binaryNumber)
+        {
+            int decimalNumber = 0;
+
+            for(int i = 0; i < binaryNumber.Length; i++)
+            {
+                if(binaryNumber[i] == 1)
+                {
+                    decimalNumber += (int)(Math.Pow(2, binaryNumber.Length - i - 1));
+                }
+            }
+
+            return decimalNumber;
+        }
 
         static void displayValue(char value, ConsoleColor colour)
         {
@@ -245,11 +275,10 @@ namespace Boolean_Expression_Simplifier
             //Populate and display the truth table
             generateTruthTable(myTruthTable, oldOut);
 
+            Console.WriteLine("\n\n----------\n\n");
 
             //Generate the Karnaugh Map
-            generateKarnaughMap(myTruthTable);
-            generateGreyCode(4);
-
+            generateKarnaughMap(myTruthTable);           
 
             return (exitTest());
         }
