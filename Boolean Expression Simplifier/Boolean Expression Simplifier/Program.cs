@@ -122,13 +122,14 @@ namespace Boolean_Expression_Simplifier
             //Populate KarnaughMap            
             for (int x = 0; x < sizeX; x++) //This takes forever
             {
-                Console.WriteLine($"X:{x}/{sizeX}");
                 for (int y = 0; y < sizeY; y++)
-                {
-                    Console.WriteLine($"    Y:{y}/{sizeY}");
-                    int[,] greyCodeX = generateGreyCode(sizeX);
-                    int[,] greyCodeY = generateGreyCode(sizeY);
+                {               
+                    //Generate greycodes for x and y axis labels       
+                    int[,] greyCodeX = generateGreyCode(numInputsX);
+                    int[,] greyCodeY = generateGreyCode(numInputsY);
 
+
+                    //copy the binary number from the grey code for the x axis for the current row
                     int[] binX;
                     binX = new int[greyCodeX.GetLength(0)];
                     for(int i = 0; i < binX.Length; i++)
@@ -136,6 +137,9 @@ namespace Boolean_Expression_Simplifier
                         binX[i] = greyCodeX[i, x];
                     }
 
+
+
+                    //copy the binary number from the grey code for the x axis for the current row
                     int[] binY;
                     binY = new int[greyCodeY.GetLength(0)];
                     for(int i = 0; i < binY.Length; i++)
@@ -143,6 +147,8 @@ namespace Boolean_Expression_Simplifier
                         binY[i] = greyCodeY[i, y];
                     }
 
+
+                    //Convert the binary numbers for the current x / y axis label into decimal numbers to be used for indexing
                     int deciX = binaryToDecimal(binX);
                     int deciY = binaryToDecimal(binY);
 
@@ -150,12 +156,13 @@ namespace Boolean_Expression_Simplifier
                     //Console.WriteLine($"X:{x} , Y:{y} , DX:{deciX} , DY:{deciY} , I:{outputIndex}");
                     //Console.WriteLine(myTruthTable[TruthTable.GetLength(0) - 1, outputIndex]);
 
+
+                    //Copy the output over from the truth table
                     myKarnaughMap[x, y] = myTruthTable[TruthTable.GetLength(0)-1, outputIndex];
                 }
             }
 
             drawKarnaughMap(myKarnaughMap, numInputsX, numInputsY);
-            Console.WriteLine("done drawing");
         }
 
         static void drawKarnaughMap(bool[,] karnaughMap, int numInputsX, int numInputsY)
@@ -163,12 +170,25 @@ namespace Boolean_Expression_Simplifier
             int[,] greyCodeX = generateGreyCode(numInputsX);
             int[,] greyCodeY = generateGreyCode(numInputsY);
 
+            //Draw greycode labels above each column
+            for(int i = 0; i < greyCodeX.GetLength(0); i++)
+            {
+                for(int j = 0; j < greyCodeX.GetLength(1); j++)
+                {
+                    Console.Write(greyCodeX[i, j]);
+                }
+                Console.WriteLine();                
+            }
+
             for(int i = 0; i < karnaughMap.GetLength(1); i++) //Loop through each row
             {
+                //Append the grey code label in front of each row
                 for(int j = 0; j < greyCodeY.GetLength(0); j++)
                 {
                     Console.Write(greyCodeY[j, i]);
                 }
+
+                //Draw the output bits
                 for (int j = 0; j < karnaughMap.GetLength(0); j++) //Loop through each column
                 {
                     displayValue(Convert.ToString(karnaughMap[j, i] ? 1 : 0)[0], backGroundBinaryColour(karnaughMap[j, i]));
@@ -177,13 +197,13 @@ namespace Boolean_Expression_Simplifier
             }
         }
 
-        static int[,] generateGreyCode(int numBits)
-        {                
-            int[,] greyCode = new int[numBits,(int)Math.Pow(2,numBits)];
+        static int[,] generateGreyCode(int numInputs)
+        {
+            int[,] greyCode = new int[numInputs,(int)Math.Pow(2,numInputs)];
 
-            for(int i = 0; i < numBits; i++) //Loop through each input
+            for(int i = 0; i < numInputs; i++) //Loop through each input
             {
-                int largeGreyCodeLength = (int)(Math.Pow(2, numBits) + Math.Pow(2, numBits));
+                int largeGreyCodeLength = (int)(Math.Pow(2, numInputs)*2);
                 int[] largeGreyCode = new int[largeGreyCodeLength];
                 
                 int index = 0;
@@ -191,7 +211,7 @@ namespace Boolean_Expression_Simplifier
 
                 while (index < largeGreyCode.Length)
                 {
-                    for (int k = 0; k < Math.Pow(2, numBits - i); k++) //K is less than 2 to the power of inverse index
+                    for (int k = 0; k < Math.Pow(2, numInputs - i); k++) //K is less than 2 to the power of inverse index
                     {
                         largeGreyCode[index] = output ? 1 : 0;
                         index++;
@@ -201,7 +221,7 @@ namespace Boolean_Expression_Simplifier
 
                 for(int j = 0; j < greyCode.GetLength(1); j++)
                 {
-                    greyCode[i, j] = largeGreyCode[j + (int)Math.Pow(2, numBits - (i + 1))];
+                    greyCode[i, j] = largeGreyCode[j + (int)Math.Pow(2, numInputs - (i + 1))];
                 }
             }
 
@@ -291,7 +311,7 @@ namespace Boolean_Expression_Simplifier
 
             Console.WriteLine("\n\n----------\n\n");
 
-            //Generate the Karnaugh Map
+            //Generate and draw the Karnaugh Map
             generateKarnaughMap(myTruthTable);           
 
             return (exitTest());
