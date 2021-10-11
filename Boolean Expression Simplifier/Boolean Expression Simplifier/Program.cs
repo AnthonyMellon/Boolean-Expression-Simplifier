@@ -173,21 +173,36 @@ namespace Boolean_Expression_Simplifier
             //Draw greycode labels above each column
             for(int i = 0; i < greyCodeX.GetLength(0); i++)
             {
+                //Pad over to align with karnaugh map
+                for(int j = 0; j < numInputsY; j++)
+                {
+                    Console.Write(" ");
+                }
+                RowPad();
+
                 for(int j = 0; j < greyCodeX.GetLength(1); j++)
                 {
-                    Console.Write(greyCodeX[i, j]);
+                    char val = (greyCodeX[i, j] ? 1 : 0).ToString()[0];
+                    displayValue(val, backGroundBinaryColour(greyCodeX[i, j]), true);
                 }
-                Console.WriteLine();                
+                Console.WriteLine();                               
             }
 
-            for(int i = 0; i < karnaughMap.GetLength(1); i++) //Loop through each row
+            for(int i = 0; i < greyCodeY.GetLength(0); i++) //Add input headings to y axis
+            {
+                displayValue((char)(i + 65), ConsoleColor.Cyan, false);
+                //Console.Write((char)(i+65));
+            }
+            Console.WriteLine();
+
+            for (int i = 0; i < karnaughMap.GetLength(1); i++) //Loop through each row
             {
                 //Append the grey code label in front of each row
                 for(int j = 0; j < greyCodeY.GetLength(0); j++)
                 {
                     char val = (greyCodeY[j, i] ? 1: 0).ToString()[0];
                     displayValue(val, backGroundBinaryColour(greyCodeY[j, i]), false);
-                }
+                }                
 
                 RowPad();
 
