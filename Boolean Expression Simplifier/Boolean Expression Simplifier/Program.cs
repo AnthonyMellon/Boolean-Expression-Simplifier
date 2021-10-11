@@ -39,7 +39,7 @@ namespace Boolean_Expression_Simplifier
                         TruthTable[col, row] = true;
                     }
 
-                    displayValue(Convert.ToString((TruthTable[col, row] ? 1 : 0))[0], backGroundBinaryColour(TruthTable[col, row]));
+                    displayValue(Convert.ToString((TruthTable[col, row] ? 1 : 0))[0], backGroundBinaryColour(TruthTable[col, row]), true);
                 }
 
                 //Calculate and populate the output value
@@ -85,7 +85,7 @@ namespace Boolean_Expression_Simplifier
 
                 //Display the output value
                 TruthTable[myTruthTable.GetLength(0) - 1, row] = outputValue;
-                displayValue(Convert.ToString((outputValue ? 1 : 0))[0], backGroundBinaryColour(outputValue));
+                displayValue(Convert.ToString((outputValue ? 1 : 0))[0], backGroundBinaryColour(outputValue), true);
                 Console.WriteLine();
 
             }
@@ -95,7 +95,7 @@ namespace Boolean_Expression_Simplifier
         {
             for (int i = 65; i < TruthTable.GetLength(0) - 1 + 65; i++)
             {
-                displayValue((char)i, ConsoleColor.Cyan);
+                displayValue((char)i, ConsoleColor.Cyan, true);
             }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("Z");
@@ -125,8 +125,8 @@ namespace Boolean_Expression_Simplifier
                 for (int y = 0; y < sizeY; y++)
                 {               
                     //Generate greycodes for x and y axis labels       
-                    int[,] greyCodeX = generateGreyCode(numInputsX);
-                    int[,] greyCodeY = generateGreyCode(numInputsY);
+                    bool[,] greyCodeX = generateGreyCode(numInputsX);
+                    bool[,] greyCodeY = generateGreyCode(numInputsY);
 
 
                     //copy the binary number from the grey code for the x axis for the current row
@@ -134,7 +134,7 @@ namespace Boolean_Expression_Simplifier
                     binX = new int[greyCodeX.GetLength(0)];
                     for(int i = 0; i < binX.Length; i++)
                     {
-                        binX[i] = greyCodeX[i, x];
+                        binX[i] = greyCodeX[i, x] ? 1 : 0;
                     }
 
 
@@ -144,7 +144,7 @@ namespace Boolean_Expression_Simplifier
                     binY = new int[greyCodeY.GetLength(0)];
                     for(int i = 0; i < binY.Length; i++)
                     {
-                        binY[i] = greyCodeY[i, y];
+                        binY[i] = greyCodeY[i, y] ? 1 : 0;
                     }
 
 
@@ -167,8 +167,8 @@ namespace Boolean_Expression_Simplifier
 
         static void drawKarnaughMap(bool[,] karnaughMap, int numInputsX, int numInputsY)
         {            
-            int[,] greyCodeX = generateGreyCode(numInputsX);
-            int[,] greyCodeY = generateGreyCode(numInputsY);
+            bool[,] greyCodeX = generateGreyCode(numInputsX);
+            bool[,] greyCodeY = generateGreyCode(numInputsY);
 
             //Draw greycode labels above each column
             for(int i = 0; i < greyCodeX.GetLength(0); i++)
@@ -185,26 +185,29 @@ namespace Boolean_Expression_Simplifier
                 //Append the grey code label in front of each row
                 for(int j = 0; j < greyCodeY.GetLength(0); j++)
                 {
-                    Console.Write(greyCodeY[j, i]);
+                    char val = (greyCodeY[j, i] ? 1: 0).ToString()[0];
+                    displayValue(val, backGroundBinaryColour(greyCodeY[j, i]), false);
                 }
+
+                RowPad();
 
                 //Draw the output bits
                 for (int j = 0; j < karnaughMap.GetLength(0); j++) //Loop through each column
                 {
-                    displayValue(Convert.ToString(karnaughMap[j, i] ? 1 : 0)[0], backGroundBinaryColour(karnaughMap[j, i]));
+                    displayValue(Convert.ToString(karnaughMap[j, i] ? 1 : 0)[0], backGroundBinaryColour(karnaughMap[j, i]), true);
                 }
                 Console.WriteLine();
             }
         }
 
-        static int[,] generateGreyCode(int numInputs)
+        static bool[,] generateGreyCode(int numInputs)
         {
-            int[,] greyCode = new int[numInputs,(int)Math.Pow(2,numInputs)];
+            bool[,] greyCode = new bool[numInputs,(int)Math.Pow(2,numInputs)];
 
             for(int i = 0; i < numInputs; i++) //Loop through each input
             {
                 int largeGreyCodeLength = (int)(Math.Pow(2, numInputs)*2);
-                int[] largeGreyCode = new int[largeGreyCodeLength];
+                bool[] largeGreyCode = new bool[largeGreyCodeLength];
                 
                 int index = 0;
                 bool output = false;
@@ -213,7 +216,7 @@ namespace Boolean_Expression_Simplifier
                 {
                     for (int k = 0; k < Math.Pow(2, numInputs - i); k++) //K is less than 2 to the power of inverse index
                     {
-                        largeGreyCode[index] = output ? 1 : 0;
+                        largeGreyCode[index] = output;
                         index++;
                     }
                     output = !output;
@@ -245,11 +248,15 @@ namespace Boolean_Expression_Simplifier
             return decimalNumber;
         }
 
-        static void displayValue(char value, ConsoleColor colour)
+        static void displayValue(char value, ConsoleColor colour, bool pad)
         {
             Console.ForegroundColor = colour;
             Console.Write(value);
-            RowPad();
+            if(pad)
+            {
+                RowPad();
+            }
+
         }
         static ConsoleColor backGroundBinaryColour(bool value)
         {
